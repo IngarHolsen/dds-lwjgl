@@ -165,7 +165,6 @@ public class DDSFile {
 
         if (dwMagic != DDS_MAGIC) {
             System.err.println("Wrong magic word! This is not a DDS file.");
-            inputStream.close();
             return;
         }
 
