@@ -19,10 +19,7 @@
 
 package net.buttology.lwjgl.dds;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
@@ -87,6 +84,17 @@ public class DDSFile {
 	}
 
 	/**
+	 * Loads a DDS file from input stream.
+	 * @param inputStream
+	 * @throws IOException
+	 * @throws FileNotFoundException
+	 */
+	public DDSFile(InputStream inputStream) throws IOException
+	{
+		this.loadFile(inputStream);
+	}
+
+	/**
 	 * Loads a DDS file from the given file.
 	 * @param file
 	 * @throws IOException 
@@ -102,47 +110,49 @@ public class DDSFile {
 	 * @param file
 	 * @throws IOException 
 	 */
-	public void loadFile(String file) throws IOException
-	{
-		this.loadFile(new File(file));
-	}
-
-	/**
-	 * Loads a DDS file.
-	 * @param file
-	 * @throws IOException 
-	 */
 	public void loadFile(File file) throws IOException
 	{
-		if(file.isFile() == false)
+		if(!file.isFile())
 		{
 			System.err.printf("DDS: File not found: '%s'%n",file.getAbsolutePath());
 			return;
 		}
-		
 		if(printDebug) System.out.printf("Loading DDS file: '%s'%n", file.getAbsolutePath());
+		this.loadFile(new FileInputStream(file));
+	}
+
+	/**
+	 * Loads a DDS file from input stream.
+	 * @param inputStream
+	 * @throws IOException 
+	 */
+	public void loadFile(InputStream inputStream) throws IOException
+	{
+
+		
+
 		
 		bdata = new ArrayList<ByteBuffer>();
 		bdata2 = new ArrayList<ByteBuffer>(); //TODO: Not properly implemented yet.
 
-		FileInputStream fis = new FileInputStream(file);
 
-		int totalByteCount = fis.available();
+
+		int totalByteCount = inputStream.available();
 		if(printDebug) System.out.println("Total bytes: "+totalByteCount);
 
 		byte[] bMagic = new byte[4];
-		fis.read(bMagic);
+		inputStream.read(bMagic);
 		dwMagic = newByteBuffer(bMagic).getInt();
 
 		if(dwMagic != DDS_MAGIC) 
 		{
 			System.err.println("Wrong magic word! This is not a DDS file.");
-			fis.close();
+			inputStream.close();
 			return;
 		}
 
 		byte[] bHeader = new byte[124];
-		fis.read(bHeader);
+		inputStream.read(bHeader);
 		header = new DDSHeader(newByteBuffer(bHeader), printDebug);
 
 		int blockSize = 16;
@@ -162,7 +172,7 @@ public class DDSFile {
 		else if(header.ddspf.sFourCC.equalsIgnoreCase("DX10")) 
 		{
 			System.err.println("Uses DX10 extended header, which is not supported!");
-			fis.close();
+			inputStream.close();
 			return;
 		}
 		else 
@@ -198,7 +208,7 @@ public class DDSFile {
 
 			if(printDebug) System.out.println("Getting main surface "+i+". Bytes: "+bytes.length);
 
-			fis.read(bytes);
+			inputStream.read(bytes);
 			totalByteCount -= bytes.length;
 			bdata.add(newByteBuffer(bytes));
 
@@ -212,7 +222,7 @@ public class DDSFile {
 
 					if(printDebug) System.out.println("Getting secondary surface "+j+". Bytes: "+bytes2.length);
 					
-					fis.read(bytes2);
+					inputStream.read(bytes2);
 					totalByteCount -= bytes2.length;
 					bdata2.add(newByteBuffer(bytes2));
 					size2 = Math.max(size2 / 4, blockSize);
@@ -220,8 +230,8 @@ public class DDSFile {
 			}
 		}
 
-		if(printDebug) System.out.printf("Remaining bytes: %d (%d)%n", fis.available(), totalByteCount);
-		fis.close();
+		if(printDebug) System.out.printf("Remaining bytes: %d (%d)%n", inputStream.available(), totalByteCount);
+		inputStream.close();
 	}
 
 	private int calculatePitch(int blockSize) {

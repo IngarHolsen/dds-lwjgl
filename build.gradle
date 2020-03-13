@@ -1,0 +1,13 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+group 'net.buttology.lwjgl'
+version '1.1.0-UNOFFICIAL-SNAPSHOT'
+

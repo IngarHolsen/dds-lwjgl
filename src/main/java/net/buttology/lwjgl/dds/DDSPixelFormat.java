@@ -69,7 +69,7 @@ public class DDSPixelFormat {
 	protected boolean hasFlagYuv;
 	protected boolean hasFlagLuminance;
 	
-	protected DDSPixelFormat(ByteBuffer header, boolean printDebug) throws IOException
+	protected DDSPixelFormat(ByteBuffer header, boolean printDebug)
 	{
 		dwSize 			= header.getInt();
 		dwFlags 		= header.getInt();
