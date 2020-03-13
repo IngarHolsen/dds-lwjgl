@@ -137,7 +137,10 @@ public class DDSFile {
             return;
         }
         if (printDebug) System.out.printf("Loading DDS file: '%s'%n", file.getAbsolutePath());
-        this.loadFile(new FileInputStream(file));
+        try (FileInputStream fis = new FileInputStream(file)) {
+            this.loadFile(fis);
+        }
+
     }
 
     /**
@@ -180,7 +183,6 @@ public class DDSFile {
             dxtFormat = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
         } else if (header.ddspf.sFourCC.equalsIgnoreCase("DX10")) {
             System.err.println("Uses DX10 extended header, which is not supported!");
-            inputStream.close();
             return;
         } else {
             System.err.println("Surface format unknown or not supported: " + header.ddspf.sFourCC);
@@ -231,7 +233,6 @@ public class DDSFile {
         }
 
         if (printDebug) System.out.printf("Remaining bytes: %d (%d)%n", inputStream.available(), totalByteCount);
-        inputStream.close();
     }
 
     private int calculatePitch(int blockSize) {

@@ -11,3 +11,13 @@ java {
 group 'net.buttology.lwjgl'
 version '1.1.0-UNOFFICIAL-SNAPSHOT'
 
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+    repositories {
+        mavenLocal()
+    }
+}
